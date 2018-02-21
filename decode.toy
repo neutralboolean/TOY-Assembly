@@ -1,0 +1,111 @@
+/**
+ * Samuel O. Ugowe
+ * COS 126: Assignment 5(decode.toy)
+ * 
+ * Decodes a Hamming-encoded message and
+ * checks for a maximum 1-bit of error in the message.
+ * 
+ * Takes a 7-bit message (4 message bits and 3 parity bits) as input and
+ * outputs a 4-bit message with any single bit error corrected.
+ */
+
+
+//Read in input
+    
+    10: 8F5B ; // R[F] <- mem[5B]
+    11: 1000 ; // no-op
+    
+    12: 7101 ; // R[1] <- addr[01]
+    
+    13: 82FF ; // R[2] <- StdIn || 1st m-bit
+    14: 2E2F ; // R[E] <- R[2] - R[F]
+    15: CE56 ; // if (R[E] == 0): pc <- 56
+    16: 83FF ; // R[3] <- StdIn || 2nd m-bit
+    17: 2E3F ; // R[E] <- R[3] - R[F]
+    18: CE56 ; // if(R[E] == 0): pc <- 56
+    19: 84FF ; // R[4] <- StdIn || 3rd m-bit
+    1A: 2E4F ; // R[E] <- R[4] - R[F]
+    1B: CE56 ; // if(R[E] == 0): pc <- 56
+    1C: 85FF ; // R[5] <- StdIn || 4th m-bit
+    1D: 2E5F ; // R[E] <- R[5] - R[F]
+    1E: CE56 ; // if(R[E] == 0): pc <- 56
+    1F: 86FF ; // R[6] <- StdIn || 1st p-bit
+    20: 2E6F ; // R[E] <- R[6] - R[F]
+    21: CE56 ; // if(R[E] == 0): pc <- 56
+    22: 87FF ; // R[7] <- StdIn || 2nd p-bit
+    23: 2E7F ; // R[E] <- R[7] - R[F]
+    24: CE56 ; // if(R[E] == 0): pc <- 56
+    25: 88FF ; // R[8] <- StdIn || 3rd p-bit
+    26: 2E8F ; // R[E] <- R[8] - R[F]
+    27: CE56 ; // if(R[E] == 0): pc <- 56
+    
+//Getting check bits
+    28: 4A62 ; // R[A] <- R[6] ^ R[2]
+    29: 4AA3 ; // R[A] <- R[A] ^ R[3]
+    2A: 4AA5 ; // R[A] <- R[A] ^ R[5]
+   
+    2B: 4B72 ; // R[B] <- R[7] ^ R[2]
+    2C: 4BB4 ; // R[B] <- R[B] ^ R[4]
+    2D: 4BB5 ; // R[B] <- R[6] ^ R[2]
+    
+    2E: 4C83 ; // R[C] <- R[8] ^ R[3]
+    2F: 4CC4 ; // R[C] <- R[C] ^ R[4]
+    30: 4CC5 ; // R[C] <- R[C] ^ R[5]
+    
+//Testing check bits    
+    31: 7103 ; // R[1] <- addr[03]
+    
+    32: 1EAB ; // R[E] <- R[A] + R[B]
+    33: 1EEC ; // R[E] <- R[E] + R[C]
+    34: 2EE1 ; // R[E] <- R[E] - R[1]
+    35: CE41 ; // if(R[E] == 0): pc <- addr[41]
+    
+    36: 7102 ; // R[1] <- addr[02]
+    
+    37: 1EAB ; // R[E] <- R[A] + R[B]
+    38: 2EE1 ; // R[E] <- R[E] - R[1]
+    39: CE45 ; // if R[E] == 0 : pc <- addr[45]
+
+    3A: 1EAC ; // R[E] <- R[A] + R[C]
+    3B: 2EE1 ; // R[E] <- R[E] - R[1]
+    3C: CE49 ; // if R[E] == 0 : pc <- addr[49]
+
+    3D: 1EBC ; // R[E] <- R[B] + R[C]
+    3E: 2EE1 ; // R[E] <- R[E] - R[1]
+    3F: CE4D ; // if R[E] == 0 : pc <- addr[4D]
+
+    40: C050 ;  // if R[0] == 0 : pc <- addr[50]
+    
+//Flips necessary bits    
+    41: 1000 ; // no-op
+    42: 7101 ; // R[1] <- addr[01]
+    43: 4515 ; // R[5] <- R[1] ^ R[5] || flip 4th message bit
+    44: C050 ; // if (R[0] == 0) : pc <- addr[53]
+    
+    45: 1000 ; // no-op
+    46: 7101 ; // R[1] <- addr[01] 
+    47: 4212 ; // R[2] <- R[1] ^ R[2] || flip 1st message bit
+    48: C050 ; // if (R[0] == 0) : pc <- addr[53]
+    
+    49: 1000 ; // no-op
+    4A: 7101 ; // R[1] <- addr[01]
+    4B: 4313 ; // R[3] <- R[1] ^ R[3] || flip 2nd message bit
+    4C: C050 ; // if (R[0] == 0) : pc <- addr[53]
+     
+    4D: 1000 ; // no-op
+    4E: 7101 ; // R[1] <- addr[01]
+    4F: 4414 ; // R[4] <- R[1] ^ R[4] || flip 3rd message bit
+    
+ //Printing decoded message to terminal   
+    50: 1000 ; // no-op
+    51: 92FF ; // StdOut <- R[2] || Outputs 1st message bit from R[9]
+    52: 93FF ; // StdOut <- R[3] || Outputs 2nd message bit
+    53: 94FF ; // StdOut <- R[4] || Outputs 3rd m-bit
+    54: 95FF ; // StdOut <- R[5] || Outputs 4th m-bit
+
+    55: C011 ; // if R[0] == 0 : pc <- addr[11]
+    56: 1000 ; // no-op label for loop-break
+    
+    57: 0000 ; // Halts program
+    
+    5B: FFFF ; // memory location for "input-checking" value

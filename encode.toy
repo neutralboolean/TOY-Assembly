@@ -1,0 +1,54 @@
+/**
+ * Samuel O. Ugowe
+ * COS 126: Assignment 5(encode.toy)
+ * 
+ * Encodes a binary message using Hamming codes,
+ * affixiing 3 parity bits to the end of 4-bit message.
+ * 
+ * Takes a 4-bit message as input
+ * and outputs a 7 bit message ( the input with 3 parity bits suffixed )
+ */
+
+    10: 8F2E ;  // Loads value in mem[50] into R[F]
+                // the following assignments are masks for the  messages bits
+    11: 1000 ;  // This is a no-op to be used as a "function" label for jumps
+                // in the parity calculation loop
+    
+//Gets input and checks for EoF input: 'FFFF'    
+    12: 81FF ; // R[1] <- StdIn || get input for 1st message bit in register 1
+    13: 2EF1 ; // R[E] <- R[F] - R[1]
+    14: CE2C ; // pc <- addr[2C] || jumps if content of input register is FFFF
+    15: 82FF ; // R[2] <- StdIn || gets 2nd message bit
+    16: 2EF2 ; // R[E] <- R[F] - R[2]
+    17: CE2C ; // pc <- addr[2C]
+    18: 83FF ; // R[3] <- StdIn || gets 3rd message bit
+    19: 2EF3 ; // R[E] <- R[F] - R[3]
+    1A: CE2C ; // pc <- addr[2C]
+    1B: 84FF ; // R[4] <- StdIn || gets 4th message bit
+    1C: 2EF4 ; // R[E] <- R[F] - R[4]
+    1D: CE2C ; // pc <- addr[2C]
+    
+//Calculate and store parity bits    
+    1E: 4512 ; // R[5] <- R[1] ^ R[2]
+    1F: 4554 ; // R[5] <- R[5] ^ R[4]
+    20: 4613 ; // R[6] <- R[1] ^ R[3]
+    21: 4664 ; // R[6] <- R[6] ^ R[4]
+    22: 4723 ; // R[7] <- R[2] ^ R[3]
+    23: 4774 ; // R[7] <- R[7] ^ R[4]
+    
+//OUTPUT all (message/parity) bit registers.
+    24: 91FF ; // StdOut <- R[1] || 1st message bit
+    25: 92FF ; // StdOut <- R[2] || 2nd message bit
+    26: 93FF ; // StdOut <- R[3] ||3rd message bit
+    27: 94FF ; // 4th message bit
+    28: 95FF ; // 1st parity bit
+    29: 96FF ; // 2nd parity bit
+    2A: 97FF ; // 3rd parity bit
+    
+    2B: C011 ; // pc <- addr[11] || loops back up to top of the program
+    2C: 1000 ; // "loop-break" label
+    
+    2D: 0000 ; // halts program
+    
+    2E: FFFF ;  // Assigns the end condition to a variable 
+                // to be loaded into a register on start-up
